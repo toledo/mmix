@@ -181,7 +181,7 @@ fewer than eight characters are specified.) This assigns a new value
 before displaying it. For example, `\.{l10=.1e3}'
 sets local register 10 equal to 100; `\.{g250="ABCD",\#a}' sets global
 register 250 equal to \Hex{000000414243440a}; `\.{M1000=-Inf}' sets
-M$[\Hex{1000}]_8=\Hex{fff0000000000000}$, the representation of $-\infty$.
+M$_8[\Hex{1000}]=\Hex{fff0000000000000}$, the representation of $-\infty$.
 Special registers other than~rI cannot be set to values disallowed by~\.{PUT}.
 Marginal registers cannot be set to nonzero values.
 
@@ -242,7 +242,8 @@ Input and output are provided by the following ten primitive system calls:
 @^input/output@>
 
 \bull \.{Fopen}|(handle,name,mode)|. Here |handle| is a
-one-byte integer, |name| is a string, and |mode| is one of the
+one-byte integer, |name| is the address of the first byte of
+a string, and |mode| is one of the
 values \.{TextRead}, \.{TextWrite}, \.{BinaryRead}, \.{BinaryWrite},
 \.{BinaryReadWrite}. An \.{Fopen} call associates |handle| with the
 external file called |name| and prepares to do input and/or output
@@ -425,7 +426,7 @@ features make the functions reasonably easy to remember.
 \.{Ftell}, and $\rm Z=\.{Handle}$. If~there are two arguments, the
 second argument is placed in \$255. If there are three arguments,
 the address of the second is placed in~\$255; the second argument
-is M$[\$255]_8$ and the third argument is M$[\$255+8]_8$. The returned
+is M$_8[\$255]$ and the third argument is M$_8[\$255+8]$. The returned
 value will be in \$255 when the system call is finished. (See the
 example below.)
 
@@ -439,8 +440,8 @@ initially set to the number of {\it command-line arguments\/}; and
 @^command line arguments@>
 local register~\$1 points to the first such argument, which
 is always a pointer to the program name. Each command-line argument is a
-pointer to a string; the last such pointer is M$[\$0\ll3+\$1]_8$, and
-M$[\$0\ll3+\$1+8]_8$ is zero. (Register~\$1 will point to an octabyte in
+pointer to a string; the last such pointer is M$_8[\$0\ll3+\$1]$, and
+M$_8[\$0\ll3+\$1+8]$ is zero. (Register~\$1 will point to an octabyte in
 \.{Pool\_Segment}, and the command-line strings will be in that segment
 too.) Location M[\.{Pool\_Segment}] will be the address of the first
 unused octabyte of the pool segment.
@@ -449,7 +450,7 @@ Registers rA, rB, rD, rE, rF, rH, rI, rJ, rM, rP, rQ, and rR
 are initially zero, and $\rm rL=2$.
 
 A subroutine library loaded with the user program might need to initialize
-itself. If an instruction has been loaded into tetrabyte M$[\Hex{f0}]_4$,
+itself. If an instruction has been loaded into tetrabyte M$_4[\Hex{f0}]$,
 the simulator actually begins execution at \Hex{f0} instead of at~\.{Main};
 in this case \$255 holds the location of~\.{Main}.
 @^subroutine library initialization@>
@@ -2330,9 +2331,8 @@ ll=mem_find(g[rS]);
 test_load_bkpt(ll);@+test_load_bkpt(ll+1);
 if (k==rZ+1) {
   x.l=G=g[rG].l=ll->tet>>24, a.l=g[rA].l=(ll+1)->tet&0x3ffff;
-  if (G<32)  x.l=G=g[rG].l=32;
-}
-else g[k].h=ll->tet, g[k].l=(ll+1)->tet;
+  if (G<32) x.l=G=g[rG].l=32;
+}@+else g[k].h=ll->tet, g[k].l=(ll+1)->tet;
 if (stack_tracing) {
   tracing=true;
   if (cur_line) show_line();
@@ -2921,6 +2921,12 @@ int main(argc,argv)
 @ Here we process the command-line options; when we finish, |*cur_arg|
 should be the name of the object file to be loaded and simulated.
 
+We assume that |argv[0]| is never null. (The author believes strongly that
+the wizards who decided to allow |argc=0| were mistaken when they defined
+the C89 standard; hence he has taken no pains to avoid system crashes
+when people try to invoke any of his programs with a null environment.
+Null invocations are contrary to the intent of \CEE/'s designers.)
+
 @d mmo_file_name *cur_arg
 
 @<Process the command line@>=
@@ -3360,10 +3366,10 @@ void show_breaks(p)
 }
 
 @ We put pointers to the command-line strings in
-M$[\.{Pool\_Segment}+8*(k+1)]_8$ for $0\le k<|argc|$;
+M$_8[\.{Pool\_Segment}+8*(k+1)]$ for $0\le k<|argc|$;
 the strings themselves are octabyte-aligned, starting at
-M$[\.{Pool\_Segment}+8*(|argc|+2)]_8$. The location of the first free
-octabyte in the pool segment is placed in M$[\.{Pool\_Segment}]_8$.
+M$_8[\.{Pool\_Segment}+8*(|argc|+2)]$. The location of the first free
+octabyte in the pool segment is placed in M$_8[\.{Pool\_Segment}]$.
 @:Pool_Segment}\.{Pool\_Segment@>
 @^command line arguments@>
 

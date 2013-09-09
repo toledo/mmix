@@ -2264,7 +2264,7 @@ case pushj: {@+register unsigned int x=cool->xx;
   cool->rl.o.l=cool_L-x-1;
   new_O=incr(cool_O,x+1);
 }@+break;
-case syncid: if (cool->loc.h&sign_bit) break;
+case syncid:@+if (cool->loc.h&sign_bit) break;
 case go: inst_ptr.p=&cool->go;@+break;
 
 @ We need to know the topmost ``hidden'' element of the register stack
@@ -3930,7 +3930,7 @@ coroutine; the I-cache or D-cache may also invoke a |fill_from_mem| coroutine,
 if there is no S-cache. When such a coroutine is invoked, it holds
 |mem_lock|, and its caller has gone to sleep.
 A physical memory address is given in |data->z.o|,
-and |data->ptr_a| specifies either |Scache|, |Icache|, or |Dcache|.
+and |data->ptr_a| specifies either |Icache|, |Dcache|, or |Scache|.
 Furthermore, |data->ptr_b| specifies a block within that
 cache, determined by the |alloc_slot| routine. The coroutine
 simulates reading the contents of the specified memory location,
