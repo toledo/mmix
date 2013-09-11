@@ -2723,6 +2723,7 @@ if its predefined value has already been used.
   acc=cur_loc;
   if (opcode==IS) {
     if (val_stack[0].status==undefined) err("the operand is undefined");
+@.the operand is undefined@>
     cur_loc=val_stack[0].equiv;
     if (val_stack[0].status==reg_val) new_link=REGISTER;
   }@+else if (opcode==GREG) cur_loc.h=0, cur_loc.l=cur_greg, new_link=REGISTER;

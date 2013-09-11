@@ -50,10 +50,10 @@ $\mu$ and~$\upsilon$, ``mems'' and ``oops.'' The simulated clock increases by
 @^mems@>
 @^oops@>
 $2^{32}$ for each~$\mu$ and 1~for each~$\upsilon$. The interval
-counter~rI decreases by~1 for each~$\upsilon$, and the usage
-count field of~rU may increase by~1~(mod~$2^{48}$) for each instruction.
+counter~rI decreases by~1 for each~$\upsilon$; and the usage
 @^rI@>
 @^rU@>
+count field of~rU may increase by~1 (modulo~$2^{47}$) for each instruction.
 
 @ To run this simulator, assuming \UNIX/ conventions, you say
 `\.{mmix} \<options> \.{progfile} \.{args...}',
@@ -2114,7 +2114,7 @@ case PBNP: case PBNPB: case PBEV: case PBEVB:@/
  if (good) good_guesses++;
  else {
    bad_guesses++, sclock.l+=2; /* penalty is $2\upsilon$ for bad guess */
-   if (g[rI].h==0 && g[rI].l<=2) tracing=breakpoint=true;
+   if (g[rI].l<=2 && g[rI].l && g[rI].h==0) tracing=breakpoint=true;
    g[rI]=incr(g[rI],-2);
  }
  break;
@@ -2653,16 +2653,14 @@ if (rop==RESUME_SET) {
 @<Update the clocks@>=
 if (sclock.l || sclock.h || !resuming) {
   sclock.h+=info[op].mems; /* clock goes up by $2^{32}$ for each $\mu$ */
-  sclock.l+=info[op].oops; /* clock goes up by 1 for each $\upsilon$ */
-  if ((!(loc.h&sign_bit) || (g[rU].h&0x8000)) &&
-      (op&(g[rU].h>>16))==g[rU].h>>24) {
-      g[rU].l++;@+ if (g[rU].l==0) {
-        g[rU].h++;@+ if ((g[rU].h&0x7fff)==0) g[rU].h-=0x8000;@+
-      }
-    } /* usage counter counts total instructions simulated */
-  g[rI]=incr(g[rI],-1); /* interval timer goes down by 1 only */
-  if (g[rI].l==0 && g[rI].h==0) tracing=breakpoint=true;
-  g[rI]=incr(g[rI],-(info[op].oops-1)); /* interval timer goes down by 1 for each $\upsilon$ */
+  sclock=incr(sclock,info[op].oops); /* clock goes up by 1 for each $\upsilon$ */
+  if ((!(loc.h&sign_bit)||(g[rU].h&0x8000)) &&@|
+    ((op&(g[rU].h>>16))==(g[rU].h>>24))) {
+      g[rU].l++;
+      if (g[rU].l==0)@+{@+g[rU].h++;@+if (g[rU].h&0x7fff==0) g[rU].h-=0x8000;@+}
+  } /* usage counter counts matched instructions simulated */
+  if (g[rI].l<=info[op].oops && g[rI].l && g[rI].h==0) tracing=breakpoint=true;
+  g[rI]=incr(g[rI],-info[op].oops); /* interval $\upsilon$ timer counts down */
 }
 
 @* Tracing. After an instruction has been executed, we often want

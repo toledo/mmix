@@ -4009,9 +4009,9 @@ case fill_from_S: {@+register cache *c=(cache *)data->ptr_a;
     }
   case 3: @<Copy data from |p| into |c->inbuf|@>;
     data->state=4;@+wait(Scache->access_time);
-  case 4:@+Scache->lock=NULL; /* we had been holding that lock */
+  case 4: Scache->lock=NULL; /* we had been holding that lock */
     data->state=5;
-  case 5:@+if (c->lock) wait(1);
+  case 5:@+ if (c->lock) wait(1);
     set_lock(self,c->lock);
     load_cache(c,(cacheblock*)data->ptr_b);
     data->state=6;@+ wait(c->copy_in_time);

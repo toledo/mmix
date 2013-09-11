@@ -2522,7 +2522,7 @@ and the usage count~$u_c$. The most significant byte of~rU is the usage
 pattern; the next most significant byte is the usage mask; and
 the remaining 48 bits are the usage count. Whenever an instruction whose
 ${\rm OP}\land u_m=u_p$ has been executed, the value of $u_c$ increases by~1
-(mod~$2^{48}$).
+(modulo~$2^{47}$).
 Thus, for example, the OP-code chart below implies that
 all instructions are counted if $u_p=u_m=0$;
 all loads and stores are counted together with \.{GO} and \.{PUSHGO}
