@@ -49,7 +49,7 @@ stated in the \MMIX\ documentation. For example, \.{MUL} takes $10\upsilon$,
 $\mu$ and~$\upsilon$, ``mems'' and ``oops.'' The simulated clock increases by
 @^mems@>
 @^oops@>
-$2^{32}$ for each~$\mu$ and 1~for each~$\upsilon$. The interval
+$2^{32}$ for each~$\mu$ and 1~for each~$\upsilon$. But the interval
 counter~rI decreases by~1 for each~$\upsilon$; and the usage
 @^rI@>
 @^rU@>
@@ -2128,14 +2128,14 @@ case LDB: case LDBI: case LDBU: case LDBUI:@/
 case LDW: case LDWI: case LDWU: case LDWUI:@/
  i=48;@+j=(w.l&0x2)<<3; goto fin_ld;
 case LDT: case LDTI: case LDTU: case LDTUI:@/
- i=32;@+j=0; goto fin_ld;
-case LDHT: case LDHTI:@/ i=j=0;
+ i=32;@+j=0;@+ goto fin_ld;
+case LDHT: case LDHTI: i=j=0;
 fin_ld: ll=mem_find(w);@+test_load_bkpt(ll);
  x.h=ll->tet;
  x=shift_right(shift_left(x,j),i,op&0x2);
 check_ld:@+if (w.h&sign_bit) goto privileged_inst;
  goto store_x;
-case LDO: case LDOI: case LDOU: case LDOUI: case LDUNC: case LDUNCI:@/
+case LDO: case LDOI: case LDOU: case LDOUI: case LDUNC: case LDUNCI:
  w.l&=-8;@+ ll=mem_find(w);
  test_load_bkpt(ll);@+test_load_bkpt(ll+1);
  x.h=ll->tet;@+ x.l=(ll+1)->tet;

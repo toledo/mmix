@@ -5759,7 +5759,7 @@ the \.{SWYM} altogether.
   resuming=2;
  case RESUME_CONT: resuming+=1+cool->zz;
   if (((cool->b.o.l>>24)&0xfa)!=0xb8) { /* not |syncd| or |syncid| */
-    unsigned int m=cool->b.o.l>>28;
+    m=cool->b.o.l>>28;
     if ((1<<m)&0x8f30) goto bad_resume;
     m=(cool->b.o.l>>16)&0xff;
     if (m>=cool_L && m<cool_G) goto bad_resume;
